@@ -1,0 +1,2 @@
+conda create env --name dsp python=3.10
+pip install tk
