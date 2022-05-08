@@ -5,6 +5,12 @@ import tkinter as Tk
 import numpy as np
 import wave
 
+global CONTINUE
+global DIRECTION,BACKGROUND,NOISE
+global load_background_flag,load_noise_flag,load_filter_flag
+global RECORDING
+
+
 '''
 TODO: 
     Add linear change in gain for sliders
@@ -91,6 +97,7 @@ Initial parameters
 DIRECTION = 2
 BACKGROUND = 1
 NOISE = 1
+RECORDING = 0
 
 '''
 Create pyaudio object for streaming audio
@@ -127,7 +134,7 @@ while CONTINUE:
         load_background_flag = 0
     
     if load_noise_flag == 1:
-        wavfile_n = get_background(NOISE)
+        wavfile_n = get_noise(NOISE)
         wfn = wave.open(wavfile_n, 'rb')
         binary_noise = wfn.readframes(BLOCKLEN)
         
@@ -137,6 +144,7 @@ while CONTINUE:
         hl,hr = get_filter(DIRECTION)
         
         load_filter_flag = 0
+    
     
     #Unpack the background and noise
     x1 = struct.unpack('h' * BLOCKLEN, binary_background)
@@ -177,6 +185,16 @@ while CONTINUE:
     if len(binary_noise) < WIDTH * BLOCKLEN:
         wfn.rewind()
         binary_noise = wfn.readframes(BLOCKLEN)
+        
+    '''
+    Need to figure out how to do this
+    '''
+    if RECORDING == 1:
+        wf = wave.open('recording.wav', 'w')
+        wf.setnchannels(CHANNELS)         
+        wf.setsampwidth(WIDTH)          
+        wf.setframerate(RATE)
+        wf.writeframes()
     
 stream.stop_stream()
 stream.close()
