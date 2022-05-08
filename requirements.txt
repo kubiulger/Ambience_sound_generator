@@ -1,2 +1,6 @@
-conda create env --name dsp python=3.10
+conda create env --name dsp python=3.9
 pip install tk
+pip install numpy
+pip install pyaudio
+pip install scipy
+pip install pillow

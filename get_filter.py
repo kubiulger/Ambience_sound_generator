@@ -4,7 +4,7 @@ import pyaudio, struct
 import tkinter as Tk   	
 import numpy as np
 import wave
-
+import scipy.signal
 
 wavfile_b = './Background/cafe_loud.wav'
 
