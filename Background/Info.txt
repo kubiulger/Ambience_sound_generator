@@ -1,0 +1,26 @@
+file name: ./Background/beach.wav
+number of channels: 1
+number of frames per second: 44100
+signal length: 5292000
+number of bytes per sample: 2
+
+file name: ./Background/cafe_loud.wav
+number of channels: 2
+number of frames per second: 44100
+signal length: 6061056
+number of bytes per sample: 3
+
+file name: ./Background/cafe_quiet.wav
+number of channels: 1
+number of frames per second: 44100
+signal length: 43740260
+number of bytes per sample: 3
+
+file name: ./Background/hotel_lobby.wav
+number of channels: 2
+number of frames per second: 44100
+signal length: 2839501
+number of bytes per sample: 2
+
+
+
