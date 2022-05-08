@@ -5,7 +5,16 @@ import tkinter as Tk
 import numpy as np
 import wave
 
-
+'''
+TODO: 
+    Add linear change in gain for sliders
+    Add more noise files
+    Add "No Direction" button and filter
+    Make button parameters global
+    Connect parameters to buttons
+    Test and debug
+    Add recording functionality
+'''
 def get_filter(i):
     '''
         Given a direction index (0 to 7) returns the HRTF filters
