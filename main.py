@@ -136,18 +136,95 @@ def change_ambient():
    label2.pack()
 
 def changeLocation(index):
-   global BACKGROUND
-   global load_background_flag
-   BACKGROUND = index #1:hotel, 2:cafe, 3:beach
-   if index ==1 and hotel['text'] == 'off'
-   load_background_flag = 1
+    global BACKGROUND
+    global load_background_flag
+    #1:hotel, 2:cafe, 3:beach
+    if index == 1 and hotel['text'] == 'off':
+        load_background_flag = 1
+        BACKGROUND = 1 
+        hotel['text'] == 'on'
+        cafe['text'] == 'off'
+        beach['text'] == 'off'
+    elif index == 1 and hotel['text'] == 'on':
+        BACKGROUND = 1
+        load_background_flag = 2
+        hotel['text'] == 'off'
+    elif index == 2 and cafe['text'] == 'off':
+        load_background_flag = 1
+        BACKGROUND = 1 
+        hotel['text'] == 'off'
+        cafe['text'] == 'on'
+        beach['text'] == 'off'
+    elif index == 2 and cafe['text'] == 'on':
+        BACKGROUND = 1
+        load_background_flag = 2
+        cafe['text'] == 'off'
+    elif index == 1 and beach['text'] == 'off':
+        load_background_flag = 1
+        BACKGROUND = 3 
+        hotel['text'] == 'off'
+        cafe['text'] == 'off'
+        beach['text'] == 'on'
+    elif index == 1 and beach['text'] == 'on':
+        BACKGROUND = 3
+        load_background_flag = 2
+        beach['text'] == 'off'
+       
    
    
 def changeSound(index):
-   global NOISE
-   global load_noise_flag
-   NOISE = index #1:garbage,2:rain, 3:people,4:icemaker
-   load_noise_flag = 1
+    global NOISE
+    global load_noise_flag
+    NOISE = index #1:garbage,2:rain, 3:people,4:icemaker
+    load_noise_flag = 1
+    if index == 1 and garbage['text'] == 'off':
+        load_noise_flag = 1
+        NOISE = 1 
+        garbage['text'] == 'on'
+        rain['text'] == 'off'
+        people['text'] == 'off'
+        icem['text'] == 'off'
+    elif index == 1 and garbage['text'] == 'on':
+        NOISE = 1
+        load_noise_flag = 2
+        garbage['text'] == 'off'
+        
+    if index == 2 and rain['text'] == 'off':
+        load_noise_flag = 1
+        NOISE = 2 
+        garbage['text'] == 'off'
+        rain['text'] == 'on'
+        people['text'] == 'off'
+        icem['text'] == 'off'
+    elif index == 2 and rain['text'] == 'on':
+        NOISE = 2
+        load_noise_flag = 2
+        rain['text'] == 'off'
+
+    if index == 3 and people['text'] == 'off':
+        load_noise_flag = 1
+        NOISE = 3 
+        garbage['text'] == 'off'
+        rain['text'] == 'off'
+        people['text'] == 'on'
+        icem['text'] == 'off'
+    elif index == 3 and people['text'] == 'on':
+        NOISE = 3
+        load_noise_flag = 2
+        people['text'] == 'off'
+    
+    if index == 4 and icem['text'] == 'off':
+        load_noise_flag = 1
+        NOISE = 4 
+        garbage['text'] == 'off'
+        rain['text'] == 'off'
+        people['text'] == 'off'
+        icem['text'] == 'on'
+    elif index == 4 and icem['text'] == 'on':
+        NOISE = 4
+        load_noise_flag = 2
+        icem['text'] == 'off'
+    
 
 def opentf():
    tf= tk.Tk()
@@ -416,8 +493,8 @@ Flags indicating a button is just pressed
 Triggers loading of new wav files and filters
 '''
 load_background_flag = 1
-load_noise_flag = 1
-load_filter_flag = 1
+load_noise_flag = 2
+load_filter_flag = 2
 
 '''
 Initial parameters
@@ -450,6 +527,8 @@ g1_prev = 0.0
 g2_prev = 0.0
 g1_now = 0.6
 g2_now = 0.4
+bg = 0.0
+nos = 0.0
 
 '''
 Connect to quit button to exit while loop
@@ -464,20 +543,25 @@ while CONTINUE:
         wavfile_b = get_background(BACKGROUND)
         wfb = wave.open(wavfile_b, 'rb')
         binary_background = wfb.readframes(BLOCKLEN)
-        
-        load_background_flag = 0
+        load_noise_flag = 0
+        bg = 1.0
+    elif load_background_flag == 2:
+        bg = 0.0
+        load_noise_flag = 0
     
     if load_noise_flag == 1:
         wavfile_n = get_noise(NOISE)
         wfn = wave.open(wavfile_n, 'rb')
         binary_noise = wfn.readframes(BLOCKLEN)
-        
+        load_noise_flag = 0
+        nos = 1.0
+    elif load_noise_flag == 2:
+        nos = 0.0
         load_noise_flag = 0
     
     if load_filter_flag == 1:
         DIRECTION = get_index(front_back,right_left)
         hl,hr = get_filter(DIRECTION)
-        
         load_filter_flag = 0
     
     
@@ -492,8 +576,8 @@ while CONTINUE:
     g1_lin = (g1_now*g1_prev)*np.array(range(BLOCKLEN))/BLOCKLEN+g1_prev
     g2_lin = (g2_now*g2_prev)*np.array(range(BLOCKLEN))/BLOCKLEN+g2_prev
     
-    y_l = g1_lin*np.array(x1) + g2_lin*np.array(x2_l)
-    y_r = g1_lin*np.array(x1) + g2_lin*np.array(x2_r)
+    y_l = bg*g1_lin*np.array(x1) + nos*g2_lin*np.array(x2_l)
+    y_r = bg*g1_lin*np.array(x1) + nos*g2_lin*np.array(x2_r)
     
     
     #Clip and convert to integer
