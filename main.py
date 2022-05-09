@@ -151,12 +151,12 @@ def changeLocation(index):
         hotel['text'] == 'off'
     elif index == 2 and cafe['text'] == 'off':
         load_background_flag = 1
-        BACKGROUND = 1 
+        BACKGROUND = 2 
         hotel['text'] == 'off'
         cafe['text'] == 'on'
         beach['text'] == 'off'
     elif index == 2 and cafe['text'] == 'on':
-        BACKGROUND = 1
+        BACKGROUND = 2
         load_background_flag = 2
         cafe['text'] == 'off'
     elif index == 1 and beach['text'] == 'off':
@@ -260,9 +260,9 @@ frame_2.grid(row=2,column=2)
 #frame_2.pack(side=tk.BOTTOM)
 
 frame_a =tk.Frame(master= window, relief= tk.RAISED)
-frame_a.grid(row =4,columnspan=3, column=1)
+frame_a.grid(row =4, column=1)
 
-label_update=tk.Frame(master= frame_a, relief= tk.RAISED) 
+label_update=tk.Label(master= frame_a,text='' ) 
 label_update.grid(row=0, column=0)
 
 #tf= tk.Button(master=frame_a, text="Show transfer function", command=opentf)
@@ -475,7 +475,39 @@ def get_background(i):
     else:
         return -1
     
+def get_text():
+    global BACKGROUND, NOISE, right_left, front_back
+     #1:hotel, 2:cafe, 3:beach
+    str = ''
+    if BACKGROUND ==1:
+        str= str+'Hotel '
+    elif BACKGROUND ==2:
+        str= str+'Cafe '
+    elif BACKGROUND ==3:
+        str= str+'Beach '
+     #1:garbage,2:rain, 3:people,4:icemaker
+    if NOISE ==1:
+        str= str+'Garbage '
+    elif NOISE ==2:
+        str= str+'Rain '
+    elif NOISE ==3:
+        str= str+'People ' 
+    elif NOISE==4:
+        str= str+'Ice maker '
+
+    if right_left==1:
+        str= str+'Right '
+    elif right_left ==2:
+        str= str+'Left ' 
     
+    if front_back ==1:
+        str =str+'Front'
+    elif front_back ==2:
+        str = str+'Back'
+
+    return str
+
+
 def get_noise(i):
     '''
         Given an index 0 to 3 returns the name of the noise file
@@ -559,9 +591,8 @@ CONTINUE = True
 while CONTINUE:
     window.update_idletasks()
     window.update()
-    
-    if load_background_flag == 1:
-        #label_update['text']=
+    label_update['text'] = get_text()
+    if load_background_flag == 1:       
         wavfile_b = get_background(BACKGROUND)
         wfb = wave.open(wavfile_b, 'rb')
         binary_background = wfb.readframes(BLOCKLEN)
