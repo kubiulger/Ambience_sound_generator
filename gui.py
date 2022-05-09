@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import GROOVE, SUNKEN, messagebox
 import tkinter.ttk as ttk
 from pdb import set_trace as TT
+from xml.etree.ElementPath import get_parent_map
 from PIL import Image 
 from PIL import ImageTk
 import pyaudio
@@ -65,12 +66,37 @@ def destroy_widget(widget):
 
 def changeRL(index):
    global right_left
-   right_left =index
+   if index==1 and right['fg']=='red': #right red
+      right['fg'] = 'green'
+      left['fg'] = 'red'
+      right_left =index
+   elif index==1 and right['fg']=='green': #right release (it was green)
+      right_left=-1
+      right['fg']='red' 
+   elif index==2 and left['fg']=='red': #left red
+      left['fg'] = 'green'
+      right['fg'] = 'red'
+      right_left =index
+   elif index==2 and left['fg']=='green': #left release (it was green)
+      right_left=-1
+      left['fg']= 'red'
 
 def changeTB(index):
    global top_bottom
-   top_bottom =index
-
+   if index==1 and top['fg']=='red': #top red
+      top['fg'] = 'green'
+      bottom['fg'] = 'red'
+      top_bottom =index
+   elif index==1 and top['fg']=='green': #top release (it was green)
+      top_bottom=-1
+      top['fg']='red' 
+   elif index==2 and bottom['fg']=='red': #bottom red
+      bottom['fg'] = 'green'
+      top['fg'] = 'red'
+      top_bottom =index
+   elif index==2 and bottom['fg']=='green': #bottom release (it was green)
+      top_bottom=-1
+      bottom['fg']= 'red'
 def quit():
    window.destroy() 
 
@@ -199,7 +225,7 @@ label_d = tk.Label(
    text = "Direction ",   
    font=18,
    fg='white',
-   bg='pink'
+   bg='red'
 )
 
 label_d.grid(row=0, column=1, sticky="nsew")
@@ -277,13 +303,13 @@ icem.grid(row=4, column=0 ,sticky="nsew")
 #Direction
 you = tk.Label(master= frame_d, text= "You", relief=tk.GROOVE)
 you.grid(row=3, column=1)
-right = tk.Button(master= frame_d, text= "Right", command=lambda:changeRL(1), relief=tk.SUNKEN)
+right = tk.Button(master= frame_d, text= "Right", command=lambda:changeRL(1), fg='red')
 right.grid(row=3, column=2 ,sticky="nsew")
-left = tk.Button(master= frame_d, text= "Left", command=lambda:changeRL(2), relief=tk.SUNKEN)
+left = tk.Button(master= frame_d, text= "Left", command=lambda:changeRL(2), fg='red')
 left.grid(row=3, column=0 ,sticky="nsew")
-top = tk.Button(master= frame_d, text= "Top", command=lambda:changeTB(1), relief=tk.SUNKEN)
+top = tk.Button(master= frame_d, text= "Top", command=lambda:changeTB(1),   fg='red')
 top.grid(row=2, column=1 ,sticky="nsew")
-bottom = tk.Button(master= frame_d, text= "Bottom", command=lambda:changeTB(2), relief=tk.SUNKEN)
+bottom = tk.Button(master= frame_d, text= "Bottom", command=lambda:changeTB(2),   fg='red')
 bottom.grid(row=4, column=1 ,sticky="nsew")
 
 
