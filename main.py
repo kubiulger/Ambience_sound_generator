@@ -42,7 +42,7 @@ RATE        = 44100                  # Frame rate (frames/second)
 WIDTH       = 2                      # Number of bytes per sample
 CHANNELS    = 1                      # Number of channels
 MAXVALUE = 2**(8*WIDTH-1) - 1
-BLOCKLEN = 1024
+BLOCKLEN = 2048
 DURATION = 5
 K = int( DURATION * RATE / BLOCKLEN )
 
@@ -426,7 +426,6 @@ def get_filter(i):
         corresponding to that direction (0 is directly infront 
         circles 45 degrees clock wise with increasing index)
     '''
-    TT()
     if i == -1:
         l_f = np.zeros(200)
         l_f[0] = 1
@@ -440,7 +439,6 @@ def get_index():
     global DIRECTION
     global front_back
     global right_left
-    TT()
     if front_back==1 and right_left==-1:
         DIRECTION=0
     elif front_back==1 and right_left==1:
@@ -509,9 +507,9 @@ right_filters = right_mat['h_r']
 Flags indicating a button is just pressed
 Triggers loading of new wav files and filters
 '''
-load_background_flag = 1
+load_background_flag = 2
 load_noise_flag = 2
-load_filter_flag = 2
+load_filter_flag = 1
 
 '''
 Initial parameters
@@ -551,10 +549,6 @@ g2_now = 0.4
 bg = 0.0
 nos = 0.0
 
-
-binary_background = [0]*BLOCKLEN
-binary_noise = [0]*BLOCKLEN
-
 '''
 Connect to quit button to exit while loop
 '''
@@ -569,31 +563,31 @@ while CONTINUE:
     if load_background_flag == 1:
         #label_update['text']=
         wavfile_b = get_background(BACKGROUND)
-        TT()
         wfb = wave.open(wavfile_b, 'rb')
-
         binary_background = wfb.readframes(BLOCKLEN)
-        load_noise_flag = 0
+        load_background_flag = 0
         bg = 1.0
     elif load_background_flag == 2:
+        wavfile_b = get_background(BACKGROUND)
+        wfb = wave.open(wavfile_b, 'rb')
+        binary_background = wfb.readframes(BLOCKLEN)
         bg = 0.0
-        load_noise_flag = 0
-    
+        load_background_flag = 0
     if load_noise_flag == 1:
-        
         wavfile_n = get_noise(NOISE)
-        
         wfn = wave.open(wavfile_n, 'rb')
         binary_noise = wfn.readframes(BLOCKLEN)
         load_noise_flag = 0
         nos = 1.0
     elif load_noise_flag == 2:
+        wavfile_n = get_noise(NOISE)
+        wfn = wave.open(wavfile_n, 'rb')
+        binary_noise = wfn.readframes(BLOCKLEN)
         nos = 0.0
         load_noise_flag = 0
     
     if load_filter_flag == 1:
         get_index()
-        TT()
         hl,hr = get_filter(DIRECTION)
         load_filter_flag = 0
     
