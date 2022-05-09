@@ -19,7 +19,7 @@ global CONTINUE
 global DIRECTION,BACKGROUND,NOISE
 global load_background_flag,load_noise_flag,load_filter_flag
 global RECORDING
-global top_bottom
+global front_back
 global right_left
 
 
@@ -90,20 +90,20 @@ def changeRL(index):
       left['fg']= 'red'
 
 def changeTB(index):
-    global top_bottom
+    global front_back
     if index==1 and top['fg']=='red': #top red
       top['fg'] = 'green'
       bottom['fg'] = 'red'
-      top_bottom =index
+      front_back =index
     elif index==1 and top['fg']=='green': #top release (it was green)
-      top_bottom=-1
+      front_back=-1
       top['fg']='red' 
     elif index==2 and bottom['fg']=='red': #bottom red
       bottom['fg'] = 'green'
       top['fg'] = 'red'
-      top_bottom =index
+      front_back =index
     elif index==2 and bottom['fg']=='green': #bottom release (it was green)
-      top_bottom=-1
+      front_back=-1
       bottom['fg']= 'red'
       
       
@@ -319,9 +319,9 @@ right = tk.Button(master= frame_d, text= "Right", command=lambda:changeRL(1), fg
 right.grid(row=3, column=2 ,sticky="nsew")
 left = tk.Button(master= frame_d, text= "Left", command=lambda:changeRL(2), fg='red')
 left.grid(row=3, column=0 ,sticky="nsew")
-top = tk.Button(master= frame_d, text= "Top", command=lambda:changeTB(1),   fg='red')
+top = tk.Button(master= frame_d, text= "Front", command=lambda:changeTB(1),   fg='red')
 top.grid(row=2, column=1 ,sticky="nsew")
-bottom = tk.Button(master= frame_d, text= "Bottom", command=lambda:changeTB(2),   fg='red')
+bottom = tk.Button(master= frame_d, text= "Back", command=lambda:changeTB(2),   fg='red')
 bottom.grid(row=4, column=1 ,sticky="nsew")
 
 
@@ -338,12 +338,33 @@ def get_filter(i):
         circles 45 degrees clock wise with increasing index)
     '''
     if i == -1:
-        left_filters = np.zeros(200)
-        left_filters[0] = 1
-        right_filters = np.zeros(200)
-        right_filters[0] = 1
-        return -1 # No filter button 
+        l_f = np.zeros(200)
+        l_f[0] = 1
+        r_f = np.zeros(200)
+        r_f[0] = 1
+        return  l_f,r_f# No filter button 
     return left_filters[i-1],right_filters[i-1]
+
+def get_direction():
+    #front:0, front_right:1, right:2..
+    global DIRECTION
+    if front_back==1 and right_left==-1:
+        DIRECTION=0
+    elif front_back==1 and right_left==1:
+        DIRECTION=1
+    elif front_back==-1 and right_left==1:
+        DIRECTION=2 
+    elif front_back==2 and right_left==1:
+        DIRECTION=3
+    elif front_back==2 and right_left==-1:
+        DIRECTION=4
+    elif front_back==2 and right_left==2:
+        DIRECTION=5
+    elif front_back==-1 and right_left==2:
+        DIRECTION=6
+    elif front_back==1 and right_left==2:
+        DIRECTION=7   
+
 
 def get_background(i):
     '''
@@ -453,7 +474,7 @@ while CONTINUE:
         load_noise_flag = 0
     
     if load_filter_flag == 1:
-        DIRECTION = get_index(top_bottom,right_left)
+        DIRECTION = get_index(front_back,right_left)
         hl,hr = get_filter(DIRECTION)
         
         load_filter_flag = 0

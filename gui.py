@@ -34,7 +34,7 @@ WIDTH       = 2         # Number of bytes per sample
 CHANNELS    = 1         # mono
 RATE        = 16000     # Sampling rate (frames/second)    
 DURATION = 5
-BLOCKLEN = 128
+BLOCKLEN = 1024
 K = int( DURATION * RATE / BLOCKLEN )
 p = pyaudio.PyAudio()
 # Open audio stream
@@ -314,21 +314,19 @@ bottom.grid(row=4, column=1 ,sticky="nsew")
 
 
 #window.mainloop()
-
+output_wf = wave.open('user_input.wav', 'w')      # wave file
+output_wf.setframerate(RATE)
+output_wf.setsampwidth(WIDTH)
+output_wf.setnchannels(CHANNELS)
 while True:
-   window.update_idletasks()
+   #window.update_idletasks()
    window.update()
-   if record:     
-      TT()
-      output_wf = wave.open('user_input.wav', 'w')      # wave file
-      output_wf.setframerate(RATE)
-      output_wf.setsampwidth(WIDTH)
-      output_wf.setnchannels(CHANNELS)
-      for i in range(K):
-         input_bytes = stream.read(BLOCKLEN, exception_on_overflow= False)
-         stream.write(input_bytes)
-         output_wf.writeframes(input_bytes)
-      record=False
+   if record:    
+      #for i in range(K):
+      input_bytes = stream.read(BLOCKLEN, exception_on_overflow= False)
+      stream.write(input_bytes)
+      output_wf.writeframes(input_bytes)
+      #record=False
 
 
 stream.stop_stream()
