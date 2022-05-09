@@ -1,48 +1,362 @@
+import tkinter as tk
+from tkinter import GROOVE, SUNKEN, messagebox
+import tkinter.ttk as ttk
+from pdb import set_trace as TT
+from xml.etree.ElementPath import get_parent_map
+from PIL import Image 
+from PIL import ImageTk
+
+import pyaudio, struct, wave
+from os.path import exists
+
 import scipy
-from scipy import io
-import pyaudio, struct
-import tkinter as Tk   	
+from scipy import io, signal
 import numpy as np
-import wave
+
+
 
 global CONTINUE
 global DIRECTION,BACKGROUND,NOISE
 global load_background_flag,load_noise_flag,load_filter_flag
 global RECORDING
+global top_bottom
+global right_left
 
 
 '''
 TODO: 
-    Add linear change in gain for sliders
-    Add more noise files
     Add "No Direction" button and filter
-    Make button parameters global
     Connect parameters to buttons
     Test and debug
     Add recording functionality
 '''
+window = tk.Tk()
+window.title('Ambience Sound Generator')
+window.rowconfigure(0, minsize=50)
+window.columnconfigure([0, 1, 2, 3], minsize=150)
+
+'''
+Initialization of wav file parameters (same for all of our files)
+'''
+RATE        = 44100                  # Frame rate (frames/second)
+WIDTH       = 2                      # Number of bytes per sample
+CHANNELS    = 1                      # Number of channels
+MAXVALUE = 2**(8*WIDTH-1) - 1
+BLOCKLEN = 1024
+DURATION = 5
+K = int( DURATION * RATE / BLOCKLEN )
+
+'''
+GUI
+'''
+#label_r = tk.Label() 
+def play():
+   #messagebox.showinfo( "Hello Python", "Hello World")
+   if exists('user_input.wav'):
+      f =  wave.open('user_input.wav','rb')  
+      for i in range(K):
+         data = f.readframes(BLOCKLEN)  
+         stream.write(data)
+   else:
+      label2 = tk.Label(text="No voice record found")
+      label2.grid(row=3, column=1)
+      window.after(2000, destroy_widget, label2) # label as argument for destroy_widget
+      
+
+def destroy_widget(widget):
+   #widget.destroy()
+   widget['text']='' 
+
+    
+
+def changeRL(index):
+    global right_left
+    global load_filter_flag
+    if index==1 and right['fg']=='red': #right red
+      load_filter_flag = 1
+      right['fg'] = 'green'
+      left['fg'] = 'red'
+      right_left =index
+    elif index==1 and right['fg']=='green': #right release (it was green)
+      right_left=-1
+      right['fg']='red' 
+    elif index==2 and left['fg']=='red': #left red
+      left['fg'] = 'green'
+      right['fg'] = 'red'
+      right_left =index
+      load_filter_flag = 1
+    elif index==2 and left['fg']=='green': #left release (it was green)
+      right_left=-1
+      left['fg']= 'red'
+
+def changeTB(index):
+    global top_bottom
+    if index==1 and top['fg']=='red': #top red
+      top['fg'] = 'green'
+      bottom['fg'] = 'red'
+      top_bottom =index
+    elif index==1 and top['fg']=='green': #top release (it was green)
+      top_bottom=-1
+      top['fg']='red' 
+    elif index==2 and bottom['fg']=='red': #bottom red
+      bottom['fg'] = 'green'
+      top['fg'] = 'red'
+      top_bottom =index
+    elif index==2 and bottom['fg']=='green': #bottom release (it was green)
+      top_bottom=-1
+      bottom['fg']= 'red'
+      
+      
+def quit():
+    global CONTINUE
+    CONTINUE = False
+    window.destroy() 
+
+label_r = tk.Label() 
+def recordorStop():
+   global record
+   my_text= r['text']
+   if my_text== "Stop":
+      label_r['text'] ="Done!"
+      label_r.grid(row=3, column=0) 
+      window.after(2000, destroy_widget, label_r) # label as argument for destroy_widget
+      r['text'] = "Record my voice" 
+      # TO DO Save the recording
+      record= False
+   else:
+      label_r['text'] ="Recording..."
+      label_r.grid(row=3, column=0) 
+      r['text'] = "Stop"
+      # TO DO Start recording
+      
+      record= True
+      
+def change_ambient():
+   label2 = tk.Label(text="Recording...")
+   label2.pack()
+
+def changeLocation(index):
+   global BACKGROUND
+   global load_background_flag
+   BACKGROUND = index #1:hotel, 2:cafe, 3:nyc
+   load_background_flag = 1
+   
+   
+def changeSound(index):
+   global NOISE
+   global load_noise_flag
+   NOISE = index #1:garbage,2:rain, 3:people,4:icemaker
+   load_noise_flag = 1
+
+def opentf():
+   tf= tk.Tk()
+   tf.title("Tranfer Function")
+   global tf_open
+   tf_open= True
+
+
+frame_header = tk.Frame(master=window, bg="black")
+frame_header.grid(row=0,columnspan=5, padx=5, pady=5, sticky="nsew")
+#frame_header.pack(side=tk.TOP, fill= tk.X)
+
+frame_p = tk.Frame(master= window, relief= SUNKEN)
+frame_p.grid(row=1, column=0)
+#frame_p.pack(side=tk.LEFT)
+
+frame_s = tk.Frame(master= window, relief=SUNKEN)
+frame_s.grid(row=1, column=1)
+
+frame_d = tk.Frame(master= window, relief=SUNKEN)
+frame_d.grid(row=1, column=2)
+#frame_d.pack(side=tk.RIGHT)
+
+frame_0 = tk.Frame(master= window, relief= GROOVE)
+frame_0.grid(row=2, column=0)
+#frame_1.pack(side=tk.BOTTOM)
+
+frame_1 = tk.Frame(master= window, relief= GROOVE)
+frame_1.grid(row=2, column=1)
+#frame_1.pack(side=tk.BOTTOM)
+
+frame_2 = tk.Frame(master= window, relief= tk.RAISED)
+frame_2.grid(row=2,column=2)
+#frame_2.pack(side=tk.BOTTOM)
+
+frame_a =tk.Frame(master= window, relief= tk.RAISED)
+frame_a.grid(row =1,column=3)
+
+
+tf= tk.Button(master=frame_a, text="Show transfer function", command=opentf)
+tf.grid(row=0, column=0)
+
+
+g_l= tk.Label(master=frame_a, text='Volume')
+g_l.grid(row=1, column=0)
+
+gain_s= tk.Scale(master=frame_a, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
+gain_s.grid(rowspan=3, column=0)
+
+# Frame border effects
+border_effects = {
+    "flat": tk.FLAT,
+    "sunken": tk.SUNKEN,
+    "raised": tk.RAISED,
+    "groove": tk.GROOVE,
+    "ridge": tk.RIDGE,
+}
+
+label = tk.Label(
+   master= frame_header,
+   text = "Ambience Sound Generator",
+   fg= "white",
+   bg = "black",
+   #width=30,
+   height=3
+   )
+label.grid(row=0, columnspan=5, padx= 300, sticky="nsew")
+
+
+label_p = tk.Label(
+  master= frame_p,
+   text = "Places", 
+   font=18,
+   fg='white',
+   bg='darkblue'
+)
+
+label_p.grid(row=0, column=0, sticky="nsew")
+
+label_s = tk.Label(
+  master= frame_s,
+   text = "Sound ",   
+   font=18,
+   fg='white',
+   bg='purple'
+)
+
+label_s.grid(row=0, column=0, sticky="nsew")
+
+label_d = tk.Label(
+  master= frame_d,
+   text = "Direction ",   
+   font=18,
+   fg='white',
+   bg='red'
+)
+
+label_d.grid(row=0, column=1, sticky="nsew")
+
+#text_box = tk.Text()
+#text_box.pack()
+
+r = tk.Button(master= frame_0, text ="Record my voice", command = recordorStop)
+r.grid(row=0, column=0, padx=40,sticky="nsew")
+B = tk.Button(master= frame_1, text ="Play my voice with an ambience", command = play)
+B.grid(row=0, column=0, padx= 20, sticky="nsew")
+q = tk.Button(master= frame_2, text ="Quit", command = quit)
+q.grid(row=0, column=1,padx=70, sticky="nsew")
+
+
+# Load the image
+image=Image.open("./Button_images/nyc.png")
+# Resize the image in the given (width, height)
+img=image.resize((150, 75))
+nyc_img= ImageTk.PhotoImage(img)
+
+image=Image.open("./Button_images/cafe.png")
+# Resize the image in the given (width, height)
+img=image.resize((150, 75))
+cafe_img= ImageTk.PhotoImage(img)
+
+image=Image.open("./Button_images/hotel.png")
+# Resize the image in the given (width, height)
+img=image.resize((150, 75))
+hotel_img= ImageTk.PhotoImage(img)
+
+image=Image.open("./Button_images/rain.png")
+# Resize the image in the given (width, height)
+img=image.resize((100, 50))
+rain_img= ImageTk.PhotoImage(img)
+
+image=Image.open("./Button_images/icem.png")
+# Resize the image in the given (width, height)
+img=image.resize((100, 50))
+icem_img= ImageTk.PhotoImage(img)
+
+image=Image.open("./Button_images/garbage.png")
+# Resize the image in the given (width, height)
+img=image.resize((100, 50))
+garbage_img= ImageTk.PhotoImage(img)
+
+image=Image.open("./Button_images/people.png")
+# Resize the image in the given (width, height)
+img=image.resize((100, 50))
+people_img= ImageTk.PhotoImage(img)
+
+
+#places
+nyc = tk.Button(master= frame_p, text= "NYC", image=nyc_img, command=lambda:changeLocation(3), relief=tk.SUNKEN)
+nyc.grid(row=4, column=0 ,sticky="nsew")
+hotel = tk.Button(master= frame_p, text= "Hotel", bg='white', image= hotel_img,command=lambda:changeLocation(1), relief=tk.SUNKEN)
+hotel.grid(row=2, column=0 ,sticky="nsew")
+cafe = tk.Button(master= frame_p, text= "Cafe", image=cafe_img, command=lambda:changeLocation(2), relief=tk.SUNKEN)
+cafe.grid(row=3, column=0 ,sticky="nsew")
+
+#Sounds
+garbage = tk.Button(master= frame_s, text= "Garbage", image= garbage_img, command=lambda:changeSound(1), relief=tk.SUNKEN)
+garbage.grid(row=1, column=0 ,sticky="nsew")
+rain = tk.Button(master= frame_s, text= "Rain", image= rain_img, command=lambda:changeSound(2), relief=tk.SUNKEN)
+rain.grid(row=2, column=0 ,sticky="nsew")
+people = tk.Button(master= frame_s, text= "People", image= people_img,command=lambda:changeSound(3), relief=tk.SUNKEN)
+people.grid(row=3, column=0 ,sticky="nsew")
+icem = tk.Button(master= frame_s, text= "Ice Maker",image= icem_img, command=lambda:changeSound(4), relief=tk.SUNKEN)
+icem.grid(row=4, column=0 ,sticky="nsew")
+
+#Direction
+you = tk.Label(master= frame_d, text= "You", relief=tk.GROOVE)
+you.grid(row=3, column=1)
+right = tk.Button(master= frame_d, text= "Right", command=lambda:changeRL(1), fg='red')
+right.grid(row=3, column=2 ,sticky="nsew")
+left = tk.Button(master= frame_d, text= "Left", command=lambda:changeRL(2), fg='red')
+left.grid(row=3, column=0 ,sticky="nsew")
+top = tk.Button(master= frame_d, text= "Top", command=lambda:changeTB(1),   fg='red')
+top.grid(row=2, column=1 ,sticky="nsew")
+bottom = tk.Button(master= frame_d, text= "Bottom", command=lambda:changeTB(2),   fg='red')
+bottom.grid(row=4, column=1 ,sticky="nsew")
+
+
+
+'''
+Filters
+'''
+
+
 def get_filter(i):
     '''
         Given a direction index (0 to 7) returns the HRTF filters
         corresponding to that direction (0 is directly infront 
         circles 45 degrees clock wise with increasing index)
     '''
-    if i == 8:
+    if i == -1:
+        left_filters = np.zeros(200)
+        left_filters[0] = 1
+        right_filters = np.zeros(200)
+        right_filters[0] = 1
         return -1 # No filter button 
-    return left_filters[i],right_filters[i]
+    return left_filters[i-1],right_filters[i-1]
 
 def get_background(i):
     '''
         Given an index 0 to 3 returns the name of the background file
         to be loaded
     '''
-    if i == 0:
+    if i == 1:
         return './Background/cafe_loud.wav'
-    elif i == 1:
-        return './Background/cafe_quiet.wav'
     elif i == 2:
-        return './Background/beach.wav'
+        return './Background/cafe_quiet.wav'
     elif i == 3:
+        return './Background/beach.wav'
+    elif i == 4:
         return './Background/hotel_lobby.wav'
     else:
         return -1
@@ -53,24 +367,16 @@ def get_noise(i):
         Given an index 0 to 3 returns the name of the noise file
         to be loaded
     '''
-    if i == 0:
-        return './Noise/rain.wav'
-    elif i == 1:
-        return './Noise/rain.wav'
+    if i == 1:
+        return './Noise/rain_inside.wav'
     elif i == 2:
-        return './Noise/rain.wav'
+        return './Noise/rain_outside.wav'
     elif i == 3:
-        return './Noise/rain.wav'
+        return './Noise/icemaker.wav'
+    elif i == 4:
+        return './Noise/garbage.wav'
     else:
         return -1
-
-'''
-Initialization of wav file parameters (same for all of our files)
-'''
-RATE        = 44100                  # Frame rate (frames/second)
-WIDTH       = 2                      # Number of bytes per sample
-CHANNELS    = 1                      # Number of channels
-MAXVALUE = 2**(8*WIDTH-1) - 1
 
 
 '''
@@ -94,9 +400,9 @@ load_filter_flag = 1
 '''
 Initial parameters
 '''
-DIRECTION = 2
-BACKGROUND = 1
-NOISE = 1
+DIRECTION = 5
+BACKGROUND = 0
+NOISE = 0
 RECORDING = 0
 
 '''
@@ -114,11 +420,14 @@ stream = p.open(
 
 
 '''
-Block processing stuff
+Initial stuff
 '''
-BLOCKLEN = 2048
 states1 = np.zeros(199)
 states2 = np.zeros(199)
+g1_prev = 0.0
+g2_prev = 0.0
+g1_now = 0.6
+g2_now = 0.4
 
 '''
 Connect to quit button to exit while loop
@@ -126,6 +435,9 @@ Connect to quit button to exit while loop
 CONTINUE = True
 
 while CONTINUE:
+    window.update_idletasks()
+    window.update()
+    
     if load_background_flag == 1:
         wavfile_b = get_background(BACKGROUND)
         wfb = wave.open(wavfile_b, 'rb')
@@ -141,6 +453,7 @@ while CONTINUE:
         load_noise_flag = 0
     
     if load_filter_flag == 1:
+        DIRECTION = get_index(top_bottom,right_left)
         hl,hr = get_filter(DIRECTION)
         
         load_filter_flag = 0
@@ -154,12 +467,12 @@ while CONTINUE:
     x2_l,states1 = scipy.signal.lfilter(hl, 1, x2,zi=states1)
     x2_r,states2 = scipy.signal.lfilter(hr, 1, x2,zi=states2)
     
-    #Add background and noise to each ear
-    '''
-    Gains will be added
-    '''
-    y_l = 1*np.array(x1) + 0.2*np.array(x2_l)
-    y_r = 1*np.array(x1) + 0.2*np.array(x2_r)
+    g1_lin = (g1_now*g1_prev)*np.array(range(BLOCKLEN))/BLOCKLEN+g1_prev
+    g2_lin = (g2_now*g2_prev)*np.array(range(BLOCKLEN))/BLOCKLEN+g2_prev
+    
+    y_l = g1_lin*np.array(x1) + g2_lin*np.array(x2_l)
+    y_r = g1_lin*np.array(x1) + g2_lin*np.array(x2_r)
+    
     
     #Clip and convert to integer
     y_l = np.clip(y_l.astype(int),-MAXVALUE,MAXVALUE)
@@ -175,6 +488,7 @@ while CONTINUE:
         output_bytes1 = struct.pack('h', yl)
         output_bytes2 = struct.pack('h', yr)
         stream.write(output_bytes1+output_bytes2)
+
     
     binary_background = wfb.readframes(BLOCKLEN)
     if len(binary_background) < WIDTH * BLOCKLEN:
@@ -185,6 +499,9 @@ while CONTINUE:
     if len(binary_noise) < WIDTH * BLOCKLEN:
         wfn.rewind()
         binary_noise = wfn.readframes(BLOCKLEN)
+        
+    g1_prev = g1_now
+    g2_prev = g2_now
         
     '''
     Need to figure out how to do this
