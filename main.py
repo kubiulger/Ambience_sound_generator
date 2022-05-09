@@ -139,8 +139,9 @@ def changeLocation(index):
    global BACKGROUND
    global load_background_flag
    BACKGROUND = index #1:hotel, 2:cafe, 3:beach
-   if index ==1 and hotel['text'] == 'off'
-   load_background_flag = 1
+
+   if index ==1 and hotel['text'] == 'off':
+       load_background_flag = 1
    
    
 def changeSound(index):
@@ -184,18 +185,23 @@ frame_2.grid(row=2,column=2)
 #frame_2.pack(side=tk.BOTTOM)
 
 frame_a =tk.Frame(master= window, relief= tk.RAISED)
-frame_a.grid(row =1,column=3)
+frame_a.grid(row =4,columnspan=3, column=1)
+
+label_update=tk.Frame(master= frame_a, relief= tk.RAISED) 
+label_update.grid(row=0, column=0)
+
+#tf= tk.Button(master=frame_a, text="Show transfer function", command=opentf)
+#tf.grid(row=0, column=0)
 
 
-tf= tk.Button(master=frame_a, text="Show transfer function", command=opentf)
-tf.grid(row=0, column=0)
+#g_l= tk.Label(master=frame_p, text='Volume')
+#g_l.grid(row=2, column=1)
 
+gain_back= tk.Scale(master=frame_p, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
+gain_back.grid(rowspan=3, row=2, column=1)
 
-g_l= tk.Label(master=frame_a, text='Volume')
-g_l.grid(row=1, column=0)
-
-gain_s= tk.Scale(master=frame_a, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
-gain_s.grid(rowspan=3, column=0)
+gain_noise= tk.Scale(master=frame_s, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
+gain_noise.grid(rowspan=3, row=2, column=1)
 
 # Frame border effects
 border_effects = {
@@ -259,10 +265,10 @@ q.grid(row=0, column=1,padx=70, sticky="nsew")
 
 
 # Load the image
-image=Image.open("./Button_images/nyc.png")
+image=Image.open("./Button_images/beach.png")
 # Resize the image in the given (width, height)
 img=image.resize((150, 75))
-nyc_img= ImageTk.PhotoImage(img)
+beach_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/cafe.png")
 # Resize the image in the given (width, height)
@@ -274,10 +280,15 @@ image=Image.open("./Button_images/hotel.png")
 img=image.resize((150, 75))
 hotel_img= ImageTk.PhotoImage(img)
 
-image=Image.open("./Button_images/rain.png")
+image=Image.open("./Button_images/rain_out.png")
 # Resize the image in the given (width, height)
 img=image.resize((100, 50))
-rain_img= ImageTk.PhotoImage(img)
+rain_out_img= ImageTk.PhotoImage(img)
+
+image=Image.open("./Button_images/rain_in.png")
+# Resize the image in the given (width, height)
+img=image.resize((100, 50))
+rain_in_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/icem.png")
 # Resize the image in the given (width, height)
@@ -296,22 +307,24 @@ people_img= ImageTk.PhotoImage(img)
 
 
 #places
-nyc = tk.Button(master= frame_p, text= "NYC", image=nyc_img, command=lambda:changeLocation(3), relief=tk.SUNKEN)
-nyc.grid(row=4, column=0 ,sticky="nsew")
-hotel = tk.Button(master= frame_p, text= "Hotel", bg='white', image= hotel_img,command=lambda:changeLocation(1), relief=tk.SUNKEN)
+beach = tk.Button(master= frame_p, text= "off", image=beach_img, command=lambda:changeLocation(3), relief=tk.SUNKEN)
+beach.grid(row=4, column=0 ,sticky="nsew")
+hotel = tk.Button(master= frame_p, text= "off", bg='white', image= hotel_img,command=lambda:changeLocation(1), relief=tk.SUNKEN)
 hotel.grid(row=2, column=0 ,sticky="nsew")
-cafe = tk.Button(master= frame_p, text= "Cafe", image=cafe_img, command=lambda:changeLocation(2), relief=tk.SUNKEN)
+cafe = tk.Button(master= frame_p, text= "off", image=cafe_img, command=lambda:changeLocation(2), relief=tk.SUNKEN)
 cafe.grid(row=3, column=0 ,sticky="nsew")
 
 #Sounds
-garbage = tk.Button(master= frame_s, text= "Garbage", image= garbage_img, command=lambda:changeSound(1), relief=tk.SUNKEN)
+garbage = tk.Button(master= frame_s, text= "off", image= garbage_img, command=lambda:changeSound(1), relief=tk.SUNKEN)
 garbage.grid(row=1, column=0 ,sticky="nsew")
-rain = tk.Button(master= frame_s, text= "Rain", image= rain_img, command=lambda:changeSound(2), relief=tk.SUNKEN)
-rain.grid(row=2, column=0 ,sticky="nsew")
-people = tk.Button(master= frame_s, text= "People", image= people_img,command=lambda:changeSound(3), relief=tk.SUNKEN)
-people.grid(row=3, column=0 ,sticky="nsew")
-icem = tk.Button(master= frame_s, text= "Ice Maker",image= icem_img, command=lambda:changeSound(4), relief=tk.SUNKEN)
-icem.grid(row=4, column=0 ,sticky="nsew")
+rain_in = tk.Button(master= frame_s, text= "off", image= rain_in_img, command=lambda:changeSound(2), relief=tk.SUNKEN)
+rain_in.grid(row=2, column=0 ,sticky="nsew")
+rain_out = tk.Button(master= frame_s, text= "off", image= rain_out_img, command=lambda:changeSound(3), relief=tk.SUNKEN)
+rain_out.grid(row=3, column=0 ,sticky="nsew")
+people = tk.Button(master= frame_s, text= "off", image= people_img,command=lambda:changeSound(4), relief=tk.SUNKEN)
+people.grid(row=4, column=0 ,sticky="nsew")
+icem = tk.Button(master= frame_s, text= "off",image= icem_img, command=lambda:changeSound(5), relief=tk.SUNKEN)
+icem.grid(row=5, column=0 ,sticky="nsew")
 
 #Direction
 you = tk.Label(master= frame_d, text= "You", relief=tk.GROOVE)
@@ -338,6 +351,7 @@ def get_filter(i):
         corresponding to that direction (0 is directly infront 
         circles 45 degrees clock wise with increasing index)
     '''
+    TT()
     if i == -1:
         l_f = np.zeros(200)
         l_f[0] = 1
@@ -346,9 +360,12 @@ def get_filter(i):
         return  l_f,r_f# No filter button 
     return left_filters[i-1],right_filters[i-1]
 
-def get_direction():
+def get_index():
     #front:0, front_right:1, right:2..
     global DIRECTION
+    global front_back
+    global right_left
+    TT()
     if front_back==1 and right_left==-1:
         DIRECTION=0
     elif front_back==1 and right_left==1:
@@ -364,7 +381,9 @@ def get_direction():
     elif front_back==-1 and right_left==2:
         DIRECTION=6
     elif front_back==1 and right_left==2:
-        DIRECTION=7   
+        DIRECTION=7
+    else:
+        DIRECTION=-1    
 
 
 def get_background(i):
@@ -426,6 +445,10 @@ DIRECTION = 5
 BACKGROUND = 1
 NOISE = 1
 RECORDING = 0
+right_left=-1
+front_back=-1
+
+
 
 '''
 Create pyaudio object for streaming audio
@@ -451,31 +474,39 @@ g2_prev = 0.0
 g1_now = 0.6
 g2_now = 0.4
 
+
 '''
 Connect to quit button to exit while loop
 '''
 CONTINUE = True
+
+
 
 while CONTINUE:
     window.update_idletasks()
     window.update()
     
     if load_background_flag == 1:
+        #label_update['text']=
         wavfile_b = get_background(BACKGROUND)
+        TT()
         wfb = wave.open(wavfile_b, 'rb')
         binary_background = wfb.readframes(BLOCKLEN)
         
         load_background_flag = 0
     
     if load_noise_flag == 1:
+        
         wavfile_n = get_noise(NOISE)
+        
         wfn = wave.open(wavfile_n, 'rb')
         binary_noise = wfn.readframes(BLOCKLEN)
         
         load_noise_flag = 0
     
     if load_filter_flag == 1:
-        DIRECTION = get_index(front_back,right_left)
+        get_index()
+        TT()
         hl,hr = get_filter(DIRECTION)
         
         load_filter_flag = 0
