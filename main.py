@@ -21,7 +21,7 @@ global load_background_flag,load_noise_flag,load_filter_flag
 global RECORDING
 global front_back
 global right_left
-
+global record
 
 '''
 TODO: 
@@ -40,7 +40,7 @@ Initialization of wav file parameters (same for all of our files)
 '''
 RATE        = 44100                  # Frame rate (frames/second)
 WIDTH       = 2                      # Number of bytes per sample
-CHANNELS    = 1                      # Number of channels
+CHANNELS    = 2                     # Number of channels
 MAXVALUE = 2**(8*WIDTH-1) - 1
 BLOCKLEN = 2048
 DURATION = 5
@@ -72,8 +72,9 @@ def destroy_widget(widget):
 def changeRL(index):
     global right_left
     global load_filter_flag
+    load_filter_flag = 1
     if index==1 and right['fg']=='red': #right red
-      load_filter_flag = 1
+      #load_filter_flag = 1
       right['fg'] = 'green'
       left['fg'] = 'red'
       right_left =index
@@ -84,7 +85,7 @@ def changeRL(index):
       left['fg'] = 'green'
       right['fg'] = 'red'
       right_left =index
-      load_filter_flag = 1
+      #load_filter_flag = 1
     elif index==2 and left['fg']=='green': #left release (it was green)
       right_left=-1
       left['fg']= 'red'
@@ -138,91 +139,107 @@ def change_ambient():
 def changeLocation(index):
     global BACKGROUND
     global load_background_flag
-    #1:hotel, 2:cafe, 3:beach
+    #1:hotel, 2:cafe empty, 3:cafe people, 4:beach
     if index == 1 and hotel['text'] == 'off':
         load_background_flag = 1
         BACKGROUND = 1 
-        hotel['text'] == 'on'
-        cafe['text'] == 'off'
-        beach['text'] == 'off'
+        hotel['text'] = 'on'
+        cafe['text'] = 'off'
+        beach['text'] = 'off'
+        cafe_people['text'] = 'off'
     elif index == 1 and hotel['text'] == 'on':
         BACKGROUND = 1
         load_background_flag = 2
-        hotel['text'] == 'off'
+        hotel['text'] = 'off'
     elif index == 2 and cafe['text'] == 'off':
         load_background_flag = 1
         BACKGROUND = 2 
-        hotel['text'] == 'off'
-        cafe['text'] == 'on'
-        beach['text'] == 'off'
+        hotel['text'] = 'off'
+        cafe['text'] = 'on'
+        beach['text'] = 'off'
+        cafe_people['text'] = 'off'
     elif index == 2 and cafe['text'] == 'on':
         BACKGROUND = 2
         load_background_flag = 2
-        cafe['text'] == 'off'
-    elif index == 1 and beach['text'] == 'off':
+        cafe['text'] = 'off'
+    elif index == 3 and cafe_people['text'] == 'off':
         load_background_flag = 1
         BACKGROUND = 3 
-        hotel['text'] == 'off'
-        cafe['text'] == 'off'
-        beach['text'] == 'on'
-    elif index == 1 and beach['text'] == 'on':
+        hotel['text'] = 'off'
+        cafe['text'] = 'off'
+        beach['text'] = 'off'
+        cafe_people['text'] = 'on'
+    elif index == 3 and cafe_people['text'] == 'on':
         BACKGROUND = 3
         load_background_flag = 2
-        beach['text'] == 'off'
-   
+        cafe_people['text'] = 'off'
+    elif index == 4 and beach['text'] == 'off':
+        load_background_flag = 1
+        BACKGROUND = 4
+        hotel['text'] = 'off'
+        cafe['text'] = 'off'
+        beach['text'] = 'on'
+        cafe_people['text'] = 'off'
+    elif index == 4 and beach['text'] == 'on':
+        BACKGROUND = 4
+        load_background_flag = 2
+        beach['text'] = 'off' 
    
 def changeSound(index):
     global NOISE
     global load_noise_flag
-    NOISE = index #1:garbage,2:rain, 3:people,4:icemaker
+    NOISE = index #1:garbage,2:rain in, 3:rain out,4:icemaker
     load_noise_flag = 1
     if index == 1 and garbage['text'] == 'off':
         load_noise_flag = 1
         NOISE = 1 
-        garbage['text'] == 'on'
-        rain_in['text'] == 'off'
-        people['text'] == 'off'
-        icem['text'] == 'off'
+        garbage['text'] = 'on'
+        rain_in['text'] = 'off'
+        rain_out['text'] = 'off'
+        #people['text'] == 'off'
+        icem['text'] = 'off'
     elif index == 1 and garbage['text'] == 'on':
         NOISE = 1
         load_noise_flag = 2
-        garbage['text'] == 'off'
+        garbage['text'] = 'off'
         
     if index == 2 and rain_in['text'] == 'off':
         load_noise_flag = 1
         NOISE = 2 
-        garbage['text'] == 'off'
-        rain_in['text'] == 'on'
-        people['text'] == 'off'
-        icem['text'] == 'off'
+        garbage['text'] = 'off'
+        rain_in['text'] = 'on'
+        rain_out['text'] = 'off'
+        #people['text'] == 'off'
+        icem['text'] = 'off'
     elif index == 2 and rain_in['text'] == 'on':
         NOISE = 2
         load_noise_flag = 2
-        rain_in['text'] == 'off'
+        rain_in['text'] = 'off'
 
-    if index == 3 and people['text'] == 'off':
+    if index == 3 and rain_out['text'] == 'off':
         load_noise_flag = 1
         NOISE = 3 
-        garbage['text'] == 'off'
-        rain_in['text'] == 'off'
-        people['text'] == 'on'
+        garbage['text'] = 'off'
+        rain_in['text'] = 'off'
+        rain_out['text'] = 'on'
+        #people['text'] == 'on'
         icem['text'] == 'off'
-    elif index == 3 and people['text'] == 'on':
+    elif index == 3 and rain_out['text'] == 'on':
         NOISE = 3
         load_noise_flag = 2
-        people['text'] == 'off'
+        rain_out['text'] = 'off'
     
     if index == 4 and icem['text'] == 'off':
         load_noise_flag = 1
         NOISE = 4 
-        garbage['text'] == 'off'
-        rain_in['text'] == 'off'
-        people['text'] == 'off'
-        icem['text'] == 'on'
+        garbage['text'] = 'off'
+        rain_in['text'] = 'off'
+        rain_out['text'] = 'off'
+        icem['text'] = 'on'
     elif index == 4 and icem['text'] == 'on':
         NOISE = 4
         load_noise_flag = 2
-        icem['text'] == 'off'
+        icem['text'] = 'off'
     
 
 def opentf():
@@ -273,10 +290,10 @@ label_update.grid(row=0, column=0)
 #g_l.grid(row=2, column=1)
 
 gain_back= tk.Scale(master=frame_p, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
-gain_back.grid(rowspan=3, row=2, column=1)
+gain_back.grid(rowspan=4, row=1, column=1)
 
 gain_noise= tk.Scale(master=frame_s, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
-gain_noise.grid(rowspan=3, row=2, column=1)
+gain_noise.grid(rowspan=4, row=1, column=1)
 
 # Frame border effects
 border_effects = {
@@ -349,6 +366,10 @@ image=Image.open("./Button_images/cafe.png")
 # Resize the image in the given (width, height)
 img=image.resize((150, 75))
 cafe_img= ImageTk.PhotoImage(img)
+image=Image.open("./Button_images/cafe_people.png")
+# Resize the image in the given (width, height)
+img=image.resize((150, 75))
+cafe_people_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/hotel.png")
 # Resize the image in the given (width, height)
@@ -357,37 +378,39 @@ hotel_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/rain_out.png")
 # Resize the image in the given (width, height)
-img=image.resize((100, 50))
+img=image.resize((150, 75))
 rain_out_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/rain_in.png")
 # Resize the image in the given (width, height)
-img=image.resize((100, 50))
+img=image.resize((150, 75))
 rain_in_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/icem.png")
 # Resize the image in the given (width, height)
-img=image.resize((100, 50))
+img=image.resize((150, 75))
 icem_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/garbage.png")
 # Resize the image in the given (width, height)
-img=image.resize((100, 50))
+img=image.resize((150, 75))
 garbage_img= ImageTk.PhotoImage(img)
 
 image=Image.open("./Button_images/people.png")
 # Resize the image in the given (width, height)
-img=image.resize((100, 50))
+img=image.resize((150, 75))
 people_img= ImageTk.PhotoImage(img)
 
 
 #places
-beach = tk.Button(master= frame_p, text= "off", image=beach_img, command=lambda:changeLocation(3), relief=tk.SUNKEN)
+beach = tk.Button(master= frame_p, text= "off", image=beach_img, command=lambda:changeLocation(4), relief=tk.SUNKEN)
 beach.grid(row=4, column=0 ,sticky="nsew")
 hotel = tk.Button(master= frame_p, text= "off", bg='white', image= hotel_img,command=lambda:changeLocation(1), relief=tk.SUNKEN)
-hotel.grid(row=2, column=0 ,sticky="nsew")
+hotel.grid(row=1, column=0 ,sticky="nsew")
 cafe = tk.Button(master= frame_p, text= "off", image=cafe_img, command=lambda:changeLocation(2), relief=tk.SUNKEN)
-cafe.grid(row=3, column=0 ,sticky="nsew")
+cafe.grid(row=2, column=0 ,sticky="nsew")
+cafe_people = tk.Button(master= frame_p, text= "off", image=cafe_people_img, command=lambda:changeLocation(3), relief=tk.SUNKEN)
+cafe_people.grid(row=3, column=0 ,sticky="nsew")
 
 #Sounds
 garbage = tk.Button(master= frame_s, text= "off", image= garbage_img, command=lambda:changeSound(1), relief=tk.SUNKEN)
@@ -396,10 +419,10 @@ rain_in = tk.Button(master= frame_s, text= "off", image= rain_in_img, command=la
 rain_in.grid(row=2, column=0 ,sticky="nsew")
 rain_out = tk.Button(master= frame_s, text= "off", image= rain_out_img, command=lambda:changeSound(3), relief=tk.SUNKEN)
 rain_out.grid(row=3, column=0 ,sticky="nsew")
-people = tk.Button(master= frame_s, text= "off", image= people_img,command=lambda:changeSound(4), relief=tk.SUNKEN)
-people.grid(row=4, column=0 ,sticky="nsew")
-icem = tk.Button(master= frame_s, text= "off",image= icem_img, command=lambda:changeSound(5), relief=tk.SUNKEN)
-icem.grid(row=5, column=0 ,sticky="nsew")
+#people = tk.Button(master= frame_s, text= "off", image= people_img,command=lambda:changeSound(4), relief=tk.SUNKEN)
+#people.grid(row=4, column=0 ,sticky="nsew")
+icem = tk.Button(master= frame_s, text= "off",image= icem_img, command=lambda:changeSound(4), relief=tk.SUNKEN)
+icem.grid(row=4, column=0 ,sticky="nsew")
 
 #Direction
 you = tk.Label(master= frame_d, text= "You", relief=tk.GROOVE)
@@ -464,13 +487,13 @@ def get_background(i):
         Given an index 0 to 3 returns the name of the background file
         to be loaded
     '''
-    if i == 1:
+    if i == 3:
         return './Background/cafe_loud.wav'
     elif i == 2:
         return './Background/cafe_quiet.wav'
-    elif i == 3:
-        return './Background/beach.wav'
     elif i == 4:
+        return './Background/beach.wav'
+    elif i == 1:
         return './Background/hotel_lobby.wav'
     else:
         return -1
@@ -482,16 +505,18 @@ def get_text():
     if BACKGROUND ==1:
         str= str+'Hotel '
     elif BACKGROUND ==2:
-        str= str+'Cafe '
+        str= str+'Empty Cafe '
     elif BACKGROUND ==3:
+        str= str+'Crowded Cafe '    
+    elif BACKGROUND ==4:
         str= str+'Beach '
-     #1:garbage,2:rain, 3:people,4:icemaker
+     #1:garbage,2:rain_in, 3:rain_4,4:icemaker
     if NOISE ==1:
         str= str+'Garbage '
     elif NOISE ==2:
-        str= str+'Rain '
+        str= str+'Inside Rain '
     elif NOISE ==3:
-        str= str+'People ' 
+        str= str+'Outside Rain ' 
     elif NOISE==4:
         str= str+'Ice maker '
 
@@ -513,13 +538,13 @@ def get_noise(i):
         Given an index 0 to 3 returns the name of the noise file
         to be loaded
     '''
-    if i == 1:
+    if i == 2:
         return './Noise/rain_inside.wav'
-    elif i == 2:
-        return './Noise/rain_outside.wav'
     elif i == 3:
-        return './Noise/icemaker.wav'
+        return './Noise/rain_outside.wav'
     elif i == 4:
+        return './Noise/ice_maker.wav'
+    elif i == 1:
         return './Noise/garbage.wav'
     else:
         return -1
@@ -563,7 +588,7 @@ stream = p.open(
   format = pyaudio.paInt16,  
   channels = 2, 
   rate = RATE,
-  input = False, 
+  input = True, 
   output = True,
   frames_per_buffer = 128)            
   # specify low frames_per_buffer to reduce latency
@@ -580,13 +605,17 @@ g1_now = 0.6
 g2_now = 0.4
 bg = 0.0
 nos = 0.0
+record=False
 
 '''
 Connect to quit button to exit while loop
 '''
 CONTINUE = True
 
-
+output_wf = wave.open('user_input.wav', 'w')      # wave file
+output_wf.setframerate(RATE)
+output_wf.setsampwidth(WIDTH)
+output_wf.setnchannels(CHANNELS)
 
 while CONTINUE:
     window.update_idletasks()
@@ -676,6 +705,13 @@ while CONTINUE:
         wf.setsampwidth(WIDTH)          
         wf.setframerate(RATE)
         wf.writeframes()
+    if record:    
+      #for i in range(K):
+      input_bytes = stream.read(BLOCKLEN, exception_on_overflow= False)
+
+      stream.write(input_bytes)
+
+      output_wf.writeframes(input_bytes)
     
 stream.stop_stream()
 stream.close()
