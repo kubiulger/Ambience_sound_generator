@@ -138,7 +138,8 @@ def change_ambient():
 def changeLocation(index):
    global BACKGROUND
    global load_background_flag
-   BACKGROUND = index #1:hotel, 2:cafe, 3:nyc
+   BACKGROUND = index #1:hotel, 2:cafe, 3:beach
+   if index ==1 and hotel['text'] == 'off'
    load_background_flag = 1
    
    
@@ -422,8 +423,8 @@ load_filter_flag = 1
 Initial parameters
 '''
 DIRECTION = 5
-BACKGROUND = 0
-NOISE = 0
+BACKGROUND = 1
+NOISE = 1
 RECORDING = 0
 
 '''
