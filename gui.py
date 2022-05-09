@@ -6,6 +6,7 @@ from PIL import Image
 from PIL import ImageTk
 import pyaudio
 import wave
+from os.path import exists
 
 
 window = tk.Tk()
@@ -42,18 +43,21 @@ stream = p.open(
     rate        = RATE,
     input       = True,
     output      = True)
-output_wf = wave.open('user_input.wav', 'w')      # wave file
-output_wf.setframerate(RATE)
-output_wf.setsampwidth(WIDTH)
-output_wf.setnchannels(CHANNELS)
+
 
 
 #label_r = tk.Label() 
 def play():
    #messagebox.showinfo( "Hello Python", "Hello World")
-   label2 = tk.Label(text="No voice record found")
-   label2.grid(row=3, column=1)
-   window.after(2000, destroy_widget, label2) # label as argument for destroy_widget
+   if exists('user_input.wav'):
+      f =  wave.open('user_input.wav','rb')  
+      for i in range(K):
+         data = f.readframes(BLOCKLEN)  
+         stream.write(data)
+   else:
+      label2 = tk.Label(text="No voice record found")
+      label2.grid(row=3, column=1)
+      window.after(2000, destroy_widget, label2) # label as argument for destroy_widget
 
 def destroy_widget(widget):
    #widget.destroy()
@@ -289,14 +293,19 @@ while True:
    window.update_idletasks()
    window.update()
    if record:     
+      TT()
+      output_wf = wave.open('user_input.wav', 'w')      # wave file
+      output_wf.setframerate(RATE)
+      output_wf.setsampwidth(WIDTH)
+      output_wf.setnchannels(CHANNELS)
       for i in range(K):
          input_bytes = stream.read(BLOCKLEN, exception_on_overflow= False)
          stream.write(input_bytes)
          output_wf.writeframes(input_bytes)
-      stream.stop_stream()
-      stream.close()
-      p.terminate()
-      output_wf.close()
       record=False
 
 
+stream.stop_stream()
+stream.close()
+p.terminate()
+utput_wf.close()
