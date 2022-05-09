@@ -550,8 +550,13 @@ g1_now = 0.6
 g2_now = 0.4
 bg = 0.0
 nos = 0.0
+<<<<<<< Updated upstream
 
 
+=======
+binary_background = [0]*BLOCKLEN
+binary_noise = [0]*BLOCKLEN
+>>>>>>> Stashed changes
 '''
 Connect to quit button to exit while loop
 '''
