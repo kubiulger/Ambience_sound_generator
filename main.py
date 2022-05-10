@@ -1,3 +1,4 @@
+from sys import getallocatedblocks
 import tkinter as tk
 from tkinter import GROOVE, SUNKEN, messagebox
 import tkinter.ttk as ttk
@@ -22,7 +23,11 @@ global RECORDING
 global front_back
 global right_left
 global record
+global play
+global play_flag
 
+play_f=False
+play_flag = False
 '''
 TODO: 
     Add "No Direction" button and filter
@@ -40,24 +45,35 @@ Initialization of wav file parameters (same for all of our files)
 '''
 RATE        = 44100                  # Frame rate (frames/second)
 WIDTH       = 2                      # Number of bytes per sample
-CHANNELS    = 2                     # Number of channels
+CHANNELS    = 2                    # Number of channels
 MAXVALUE = 2**(8*WIDTH-1) - 1
 BLOCKLEN = 2048
 DURATION = 5
 K = int( DURATION * RATE / BLOCKLEN )
+global count
+
+count=0
 
 '''
 GUI
 '''
 #label_r = tk.Label() 
 def play():
+    global play_f
+    global count
+    global play_flag
    #messagebox.showinfo( "Hello Python", "Hello World")
-   if exists('user_input.wav'):
-      f =  wave.open('user_input.wav','rb')  
-      for i in range(K):
-         data = f.readframes(BLOCKLEN)  
-         stream.write(data)
-   else:
+    if exists('user_input.wav'):
+      #f =  wave.open('user_input.wav','rb')  
+        play_f= True
+        play_flag=True
+        #f =  wave.open('user_input.wav','rb') 
+        #count = f.getnframes()
+      #or i in range(K):
+         #data = f.readframes(BLOCKLEN) 
+
+         #stream.write(data)
+    else:
       label2 = tk.Label(text="No voice record found")
       label2.grid(row=3, column=1)
       window.after(2000, destroy_widget, label2) # label as argument for destroy_widget
@@ -92,6 +108,8 @@ def changeRL(index):
 
 def changeTB(index):
     global front_back
+    global load_filter_flag
+    load_filter_flag = 1
     if index==1 and top['fg']=='red': #top red
       top['fg'] = 'green'
       bottom['fg'] = 'red'
@@ -289,11 +307,13 @@ label_update.grid(row=0, column=0)
 #g_l= tk.Label(master=frame_p, text='Volume')
 #g_l.grid(row=2, column=1)
 
-gain_back= tk.Scale(master=frame_p, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
+gain_back= tk.Scale(master=frame_p, from_=0.0, to=1.0, length= 200,resolution = 0.01, orient=tk.VERTICAL)
 gain_back.grid(rowspan=4, row=1, column=1)
+gain_back.set(0.5)
 
-gain_noise= tk.Scale(master=frame_s, from_=0, to=2, length= 200,resolution = 0.01, orient=tk.VERTICAL)
+gain_noise= tk.Scale(master=frame_s, from_=0.0, to=1.0, length= 200,resolution = 0.01, orient=tk.VERTICAL)
 gain_noise.grid(rowspan=4, row=1, column=1)
+gain_noise.set(0.5)
 
 # Frame border effects
 border_effects = {
@@ -502,23 +522,25 @@ def get_text():
     global BACKGROUND, NOISE, right_left, front_back
      #1:hotel, 2:cafe, 3:beach
     str = ''
-    if BACKGROUND ==1:
-        str= str+'Hotel '
-    elif BACKGROUND ==2:
-        str= str+'Empty Cafe '
-    elif BACKGROUND ==3:
-        str= str+'Crowded Cafe '    
-    elif BACKGROUND ==4:
-        str= str+'Beach '
+    if load_background_flag!=2:
+        if BACKGROUND ==1:
+            str= str+'Hotel '
+        elif BACKGROUND ==2:
+            str= str+'Empty Cafe '
+        elif BACKGROUND ==3:
+            str= str+'Crowded Cafe '    
+        elif BACKGROUND ==4:
+            str= str+'Beach '
      #1:garbage,2:rain_in, 3:rain_4,4:icemaker
-    if NOISE ==1:
-        str= str+'Garbage '
-    elif NOISE ==2:
-        str= str+'Inside Rain '
-    elif NOISE ==3:
-        str= str+'Outside Rain ' 
-    elif NOISE==4:
-        str= str+'Ice maker '
+    if load_noise_flag!=2:
+        if NOISE ==1:
+            str= str+'Garbage '
+        elif NOISE ==2:
+            str= str+'Inside Rain '
+        elif NOISE ==3:
+            str= str+'Outside Rain ' 
+        elif NOISE==4:
+            str= str+'Ice maker '
 
     if right_left==1:
         str= str+'Right '
@@ -564,16 +586,16 @@ right_filters = right_mat['h_r']
 Flags indicating a button is just pressed
 Triggers loading of new wav files and filters
 '''
-load_background_flag = 2
-load_noise_flag = 2
+load_background_flag = 1
+load_noise_flag = 1
 load_filter_flag = 1
 
 '''
 Initial parameters
 '''
 DIRECTION = 5
-BACKGROUND = 1
-NOISE = 1
+BACKGROUND = 2
+NOISE = 3
 RECORDING = 0
 right_left=-1
 front_back=-1
@@ -586,7 +608,7 @@ Create pyaudio object for streaming audio
 p = pyaudio.PyAudio()
 stream = p.open(
   format = pyaudio.paInt16,  
-  channels = 2, 
+  channels = CHANNELS, 
   rate = RATE,
   input = True, 
   output = True,
@@ -620,26 +642,32 @@ output_wf.setnchannels(CHANNELS)
 while CONTINUE:
     window.update_idletasks()
     window.update()
-    label_update['text'] = get_text()
-    if load_background_flag == 1:       
+    g1_now = gain_back.get() + 0.0
+    g2_now = gain_noise.get() + 0.0
+
+    if load_background_flag == 1:
+        label_update['text'] = get_text()       
         wavfile_b = get_background(BACKGROUND)
         wfb = wave.open(wavfile_b, 'rb')
         binary_background = wfb.readframes(BLOCKLEN)
         load_background_flag = 0
         bg = 1.0
     elif load_background_flag == 2:
+        label_update['text'] = get_text()
         wavfile_b = get_background(BACKGROUND)
         wfb = wave.open(wavfile_b, 'rb')
         binary_background = wfb.readframes(BLOCKLEN)
         bg = 0.0
         load_background_flag = 0
     if load_noise_flag == 1:
+        label_update['text'] = get_text()
         wavfile_n = get_noise(NOISE)
         wfn = wave.open(wavfile_n, 'rb')
         binary_noise = wfn.readframes(BLOCKLEN)
         load_noise_flag = 0
         nos = 1.0
     elif load_noise_flag == 2:
+        label_update['text'] = get_text()
         wavfile_n = get_noise(NOISE)
         wfn = wave.open(wavfile_n, 'rb')
         binary_noise = wfn.readframes(BLOCKLEN)
@@ -647,6 +675,7 @@ while CONTINUE:
         load_noise_flag = 0
     
     if load_filter_flag == 1:
+        label_update['text'] = get_text()
         get_index()
         hl,hr = get_filter(DIRECTION)
         load_filter_flag = 0
@@ -676,8 +705,23 @@ while CONTINUE:
     Might need to find a better way to do this
     '''
     for i in range(BLOCKLEN):
+        if play_f:
+            if play_flag:
+                play_flag=False
+                f = wave.open('user_input.wav','rb')
+                count = f.getnframes()
+            count=count-1
+            data = f.readframes(1) 
+            data= struct.unpack('h'*2, data)
+            if count == 0:
+                play_f = False    
+        else:
+            data=[0,0]
+
         yl = y_l[i]
         yr = y_r[i]
+        yl=yl+data[0]
+        yr= yr+data[1]
         output_bytes1 = struct.pack('h', yl)
         output_bytes2 = struct.pack('h', yr)
         stream.write(output_bytes1+output_bytes2)
@@ -706,12 +750,12 @@ while CONTINUE:
         wf.setframerate(RATE)
         wf.writeframes()
     if record:    
-      #for i in range(K):
-      input_bytes = stream.read(BLOCKLEN, exception_on_overflow= False)
+        #for i in range(K):
+        input_bytes = stream.read(BLOCKLEN, exception_on_overflow= False)
+            #stream.write(input_bytes)
+        output_wf.writeframes(input_bytes)
+        #record=False
 
-      stream.write(input_bytes)
-
-      output_wf.writeframes(input_bytes)
     
 stream.stop_stream()
 stream.close()
