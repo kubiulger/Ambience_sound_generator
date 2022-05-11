@@ -7,6 +7,8 @@ The following capture is from our GUI:
 
 <img width="698" alt="Screen Shot 2022-05-11 at 5 55 27 PM" src="https://user-images.githubusercontent.com/23522642/167954271-0d7e888e-7028-4b42-9a27-bd5af9e8c2c4.png">
 
+(LINK EKLEYELIM SOUNDLAR ICIN BEN NERDEN ALDIK TAM BILMIYORUM)
+
 As you can see, our GUI includes choices of places:
  * Hotel
  * Empty Cafe
