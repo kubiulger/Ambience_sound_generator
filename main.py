@@ -612,7 +612,7 @@ stream = p.open(
   rate = RATE,
   input = True, 
   output = True,
-  frames_per_buffer = 128)            
+  frames_per_buffer = 128) 
   # specify low frames_per_buffer to reduce latency
 
 
@@ -699,11 +699,9 @@ while CONTINUE:
     #Clip and convert to integer
     y_l = np.clip(y_l.astype(int),-MAXVALUE,MAXVALUE)
     y_r = np.clip(y_r.astype(int),-MAXVALUE,MAXVALUE)
-    
-    '''
-    Combines left and right ear
-    Might need to find a better way to do this
-    '''
+    #print(DIRECTION)
+
+
     for i in range(BLOCKLEN):
         if play_f:
             if play_flag:
@@ -722,6 +720,8 @@ while CONTINUE:
         yr = y_r[i]
         yl=yl+data[0]
         yr= yr+data[1]
+        #yl = np.clip(yl,-MAXVALUE,MAXVALUE)
+        #yr = np.clip(yr,-MAXVALUE,MAXVALUE) 
         output_bytes1 = struct.pack('h', yl)
         output_bytes2 = struct.pack('h', yr)
         stream.write(output_bytes1+output_bytes2)
@@ -740,9 +740,7 @@ while CONTINUE:
     g1_prev = g1_now
     g2_prev = g2_now
         
-    '''
-    Need to figure out how to do this
-    '''
+
     if RECORDING == 1:
         wf = wave.open('recording.wav', 'w')
         wf.setnchannels(CHANNELS)         

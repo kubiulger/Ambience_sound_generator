@@ -97,7 +97,7 @@ load_filter_flag = 1
 '''
 Initial parameters
 '''
-DIRECTION = 5
+DIRECTION = 1
 BACKGROUND = 0
 NOISE = 0
 RECORDING = 0
@@ -125,7 +125,7 @@ states2 = np.zeros(199)
 g1_prev = 0.0
 g2_prev = 0.0
 g1_now = 0.6
-g2_now = 0.0
+g2_now = 0.3
 
 '''
 Connect to quit button to exit while loop
